@@ -28,7 +28,7 @@ const IMPORTER = (filePath: string) => {
   return import(filePath)
 }
 
-const app = new Ignitor(APP_ROOT, { importer: IMPORTER }).tap((app) => {
+const ignitor = new Ignitor(APP_ROOT, { importer: IMPORTER }).tap((app) => {
   app.booting(async () => {
     await import('#start/env')
   })
@@ -37,7 +37,7 @@ const app = new Ignitor(APP_ROOT, { importer: IMPORTER }).tap((app) => {
 })
 
 try {
-  await app.httpServer().start()
+  await ignitor.httpServer().start()
 } catch (error) {
   process.exitCode = 1
   prettyPrintError(error)

@@ -15,8 +15,8 @@
     "dev": "node ace serve --hmr",
     "test": "vitest",
     "test:unit": "vitest run",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "typecheck": "tsc --noEmit"
