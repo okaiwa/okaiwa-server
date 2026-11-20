@@ -1,5 +1,7 @@
 # Okaiwa Server — Guide de developpement
 
+Lire d'abord docs/project-status.md ; le mettre à jour (ainsi que docs/app-store-review.md) dans chaque PR qui change l'état.
+
 ## Description du projet
 
 Okaiwa Server est le monorepo backend de la plateforme Okaiwa, un messager securise avec portefeuille crypto integre. Il contient 4 micro-services AdonisJS : relay, identity, push, blockchain.
