@@ -19,7 +19,7 @@ jobs:
 
   git-conflicts:
     name: Git Conflicts
-    runs-on: [self-hosted, linux, x64, ci]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - name: Check for merge conflict markers
@@ -31,7 +31,7 @@ jobs:
 
   lockfile:
     name: Lockfile
-    runs-on: [self-hosted, linux, x64, ci]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4 # version auto-detected from package.json "packageManager"
@@ -44,7 +44,7 @@ jobs:
 
   prettier:
     name: Prettier
-    runs-on: [self-hosted, linux, x64, ci]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4 # version auto-detected from package.json "packageManager"
@@ -57,7 +57,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: [self-hosted, linux, x64, ci]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4 # version auto-detected from package.json "packageManager"
@@ -70,7 +70,7 @@ jobs:
 
   typecheck:
     name: Type Check
-    runs-on: [self-hosted, linux, x64, ci]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4 # version auto-detected from package.json "packageManager"
@@ -83,7 +83,7 @@ jobs:
 
   security-audit:
     name: Security Audit
-    runs-on: [self-hosted, linux, x64, ci]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4 # version auto-detected from package.json "packageManager"
@@ -99,7 +99,7 @@ jobs:
   banned-keywords:
     name: Banned Keywords
     needs: [git-conflicts, lockfile, prettier, lint, typecheck, security-audit]
-    runs-on: [self-hosted, linux, x64, ci]
+    runs-on: ubuntu-latest
     continue-on-error: true
     steps:
       - uses: actions/checkout@v6
@@ -125,7 +125,7 @@ jobs:
   tests:
     name: Tests
     needs: [git-conflicts, lockfile, prettier, lint, typecheck, security-audit]
-    runs-on: [self-hosted, linux, x64, ci]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4 # version auto-detected from package.json "packageManager"
@@ -134,6 +134,13 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      - name: DEBUG ace loader
+        working-directory: push
+        run: |
+          node -v; ls node_modules | head -40; ls node_modules/ts-node-maintained >/dev/null && echo TSNODE_PRESENT
+          printenv | grep -E '^(NODE_|TS_NODE)' | cut -d= -f1 || true
+          node --input-type=module -e "import('ts-node-maintained/register/esm').then(()=>console.log('LOADER_OK'),e=>console.log('LOADER_ERR',e))"
+          node ace build 2>&1 | tail -30 || true
       - run: pnpm run test
 
   # ──────────────────────────────────────────────
@@ -144,7 +151,7 @@ jobs:
     name: PR Summary
     if: always()
     needs: [git-conflicts, lockfile, prettier, lint, typecheck, security-audit, tests]
-    runs-on: [self-hosted, linux, x64, ci]
+    runs-on: ubuntu-latest
     steps:
       - name: Check critical results
         run: |
