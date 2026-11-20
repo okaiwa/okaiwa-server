@@ -142,7 +142,7 @@ export default class AuthController {
      * an isolated database. This separation ensures no single service
      * has both the contact info and the identity key.
      *
-     * TODO: Implement Brevo gateway RPC.
+     * TODO(#54): Implement Brevo gateway RPC.
      */
 
     response.created({
@@ -238,7 +238,7 @@ export default class AuthController {
     }
 
     /**
-     * TODO: trigger the Brevo gateway to deliver a fresh OTP code
+     * TODO(#54): trigger the Brevo gateway to deliver a fresh OTP code
      * (SMS + email in parallel). The gateway has its own DB mapping
      * accountId → (phone, email) and validates without revealing
      * either contact to this service.
@@ -296,7 +296,7 @@ export default class AuthController {
     if (isDev && bypass && code === bypass) {
       return true
     }
-    // TODO: Implement Brevo gateway RPC call for production codes.
+    // TODO(#54): Implement Brevo gateway RPC call for production codes.
     return false
   }
 

@@ -128,7 +128,7 @@ export class FcmService {
     const url = `${FCM_API_BASE}/projects/${this.projectId}/messages:send`
 
     /**
-     * TODO: Implement HTTP POST to FCM API.
+     * TODO(#55): Implement HTTP POST to FCM API.
      *
      * Request:
      * POST {url}
@@ -160,7 +160,7 @@ export class FcmService {
    */
   private async getAccessToken(): Promise<string> {
     /**
-     * TODO: Implement Google OAuth2 token exchange.
+     * TODO(#55): Implement Google OAuth2 token exchange.
      *
      * 1. Read the service account key from `this.serviceAccountKeyPath`
      *    (resolved from GOOGLE_APPLICATION_CREDENTIALS).

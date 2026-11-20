@@ -249,7 +249,7 @@ export default class ProfileController {
             /**
              * Wallet addresses are only shown for public profiles.
              * For "contacts" visibility, they require mutual contact
-             * verification (TODO: implement contact verification).
+             * verification (TODO(#54): implement contact verification).
              */
             exposedWalletAddresses:
               profile.visibility === 'public' ? profile.exposedWalletAddresses : [],
