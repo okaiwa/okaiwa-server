@@ -41,7 +41,7 @@ export const sendPushValidator = vine.compile(
      * Determines which push service (APNs or FCM) to use.
      */
     platform: vine.enum(['ios', 'android'] as const),
-  })
+  }),
 )
 
 /**
@@ -68,5 +68,5 @@ export const registerDeviceValidator = vine.compile(
      * Target platform.
      */
     platform: vine.enum(['ios', 'android'] as const),
-  })
+  }),
 )

@@ -35,7 +35,10 @@ export default class Handler extends ExceptionHandler {
    * @param error - The thrown exception
    * @param ctx - AdonisJS HTTP context
    */
-  async handle(error: Error & { status?: number; code?: string; messages?: unknown }, ctx: HttpContext): Promise<void> {
+  async handle(
+    error: Error & { status?: number; code?: string; messages?: unknown },
+    ctx: HttpContext,
+  ): Promise<void> {
     const status = error.status ?? 500
     const { response } = ctx
 
@@ -128,7 +131,7 @@ export default class Handler extends ExceptionHandler {
            * (contains encrypted messages).
            */
           timestamp: new Date().toISOString(),
-        })
+        }),
       )
     }
   }

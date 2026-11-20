@@ -52,9 +52,7 @@ export class ApnsService {
   private readonly authKey: string
 
   constructor() {
-    this.host = process.env.NODE_ENV === 'production'
-      ? APNS_HOST_PRODUCTION
-      : APNS_HOST_SANDBOX
+    this.host = process.env.NODE_ENV === 'production' ? APNS_HOST_PRODUCTION : APNS_HOST_SANDBOX
 
     this.bundleId = process.env.APNS_BUNDLE_ID ?? ''
     this.teamId = process.env.APNS_TEAM_ID ?? ''
@@ -124,11 +122,11 @@ export class ApnsService {
       'apns-push-type': PUSH_TYPE,
       'apns-priority': SILENT_PUSH_PRIORITY,
       'apns-expiration': '0',
-      'authorization': `bearer ${await this.generateJwt()}`,
+      authorization: `bearer ${await this.generateJwt()}`,
     }
 
     /**
-     * TODO: Implement HTTP/2 request to APNs.
+     * TODO(#55): Implement HTTP/2 request to APNs.
      *
      * Endpoint: https://{this.host}:{APNS_PORT}/3/device/{deviceToken}
      * Method:   POST
@@ -159,7 +157,7 @@ export class ApnsService {
    */
   private async generateJwt(): Promise<string> {
     /**
-     * TODO: Implement JWT generation using the APNs auth key.
+     * TODO(#55): Implement JWT generation using the APNs auth key.
      *
      * Header: { "alg": "ES256", "kid": this.keyId }
      * Payload: { "iss": this.teamId, "iat": Math.floor(Date.now() / 1000) }

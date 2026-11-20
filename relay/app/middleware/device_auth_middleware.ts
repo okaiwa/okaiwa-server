@@ -118,10 +118,7 @@ export default class DeviceAuthMiddleware {
      * reveal the HMAC character-by-character.
      */
     try {
-      return timingSafeEqual(
-        Buffer.from(providedHmac, 'hex'),
-        Buffer.from(expectedHmac, 'hex')
-      )
+      return timingSafeEqual(Buffer.from(providedHmac, 'hex'), Buffer.from(expectedHmac, 'hex'))
     } catch {
       return false
     }

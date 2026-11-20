@@ -42,7 +42,7 @@ const chainValidator = vine.compile(
       'avalanche',
       'bsc',
     ] as const),
-  })
+  }),
 )
 
 @inject()

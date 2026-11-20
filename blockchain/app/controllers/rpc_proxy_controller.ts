@@ -61,7 +61,7 @@ const rpcProxyValidator = vine.compile(
      * and echo it back unchanged in the response — the value is client-opaque.
      */
     id: vine.any(),
-  })
+  }),
 )
 
 /** Validator for chain parameter. */
@@ -76,14 +76,14 @@ const chainValidator = vine.compile(
       'avalanche',
       'bsc',
     ] as const),
-  })
+  }),
 )
 
 /** Validator for broadcast transaction. */
 const broadcastValidator = vine.compile(
   vine.object({
     signedTransaction: vine.string().regex(/^0x[a-fA-F0-9]+$/),
-  })
+  }),
 )
 
 @inject()

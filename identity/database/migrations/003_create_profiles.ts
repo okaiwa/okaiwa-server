@@ -25,7 +25,10 @@ export default class CreateProfiles extends BaseSchema {
        * One-to-one relationship: each account has at most one profile.
        * CASCADE delete: profile is removed when account is deleted.
        */
-      table.uuid('account_id').notNullable().unique()
+      table
+        .uuid('account_id')
+        .notNullable()
+        .unique()
         .references('id')
         .inTable('accounts')
         .onDelete('CASCADE')
@@ -65,11 +68,14 @@ export default class CreateProfiles extends BaseSchema {
        *
        * Default: "public" — users can restrict after registration.
        */
-      table.enum('visibility', ['public', 'contacts', 'private'], {
-        useNative: true,
-        enumName: 'profile_visibility',
-        existingType: false,
-      }).notNullable().defaultTo('public')
+      table
+        .enum('visibility', ['public', 'contacts', 'private'], {
+          useNative: true,
+          enumName: 'profile_visibility',
+          existingType: false,
+        })
+        .notNullable()
+        .defaultTo('public')
 
       table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now())
       table.timestamp('updated_at', { useTz: true }).notNullable().defaultTo(this.now())

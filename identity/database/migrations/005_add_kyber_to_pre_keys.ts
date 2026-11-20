@@ -35,7 +35,7 @@ export default class AddKyberToPreKeys extends BaseSchema {
       table.boolean('is_kyber_pre_key').notNullable().defaultTo(false)
       table.index(
         ['account_id', 'is_kyber_pre_key', 'consumed'],
-        'idx_pre_keys_account_kyber_consumed'
+        'idx_pre_keys_account_kyber_consumed',
       )
     })
   }
@@ -44,7 +44,7 @@ export default class AddKyberToPreKeys extends BaseSchema {
     this.schema.alterTable(this.tableName, (table) => {
       table.dropIndex(
         ['account_id', 'is_kyber_pre_key', 'consumed'],
-        'idx_pre_keys_account_kyber_consumed'
+        'idx_pre_keys_account_kyber_consumed',
       )
       table.dropColumn('is_kyber_pre_key')
     })

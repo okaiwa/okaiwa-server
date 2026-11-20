@@ -4,9 +4,7 @@ import server from '@adonisjs/core/services/server'
 /**
  * Server-level middleware runs on every HTTP request.
  */
-server.use([
-  () => import('@adonisjs/core/bodyparser_middleware'),
-])
+server.use([() => import('@adonisjs/core/bodyparser_middleware')])
 
 /**
  * Router-level middleware runs on matched routes.

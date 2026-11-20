@@ -35,7 +35,7 @@ type Platform = 'ios' | 'android'
 export default class PushController {
   constructor(
     private readonly apns: ApnsService,
-    private readonly fcm: FcmService
+    private readonly fcm: FcmService,
   ) {}
 
   /**
@@ -79,9 +79,10 @@ export default class PushController {
        * or any internal error details. We only report that the
        * push failed.
        */
-      const code = error instanceof Error && 'code' in error
-        ? (error as Error & { code: string }).code
-        : 'UNKNOWN'
+      const code =
+        error instanceof Error && 'code' in error
+          ? (error as Error & { code: string }).code
+          : 'UNKNOWN'
 
       if (code === 'INVALID_TOKEN') {
         /**
@@ -111,7 +112,7 @@ export default class PushController {
     const payload = await request.validateUsing(registerDeviceValidator)
 
     /**
-     * TODO: Store payload.deviceToken, payload.platform, payload.deviceId
+     * TODO(#55): Store payload.deviceToken, payload.platform, payload.deviceId
      * in the database or Redis. The storage maps deviceId → { pushToken,
      * platform }. This mapping does NOT include user identity. Old tokens
      * for the same deviceId should be replaced (devices rotate push

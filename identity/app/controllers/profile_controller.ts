@@ -36,9 +36,10 @@ const updateProfileValidator = vine.compile(
      * This is an explicit opt-in action by the user.
      * Addresses are stored lowercase for consistent lookups.
      */
-    exposedWalletAddresses: vine.array(
-      vine.string().regex(/^0x[a-fA-F0-9]{40}$/)
-    ).maxLength(10).optional(),
+    exposedWalletAddresses: vine
+      .array(vine.string().regex(/^0x[a-fA-F0-9]{40}$/))
+      .maxLength(10)
+      .optional(),
 
     /**
      * Profile visibility level.
@@ -49,8 +50,13 @@ const updateProfileValidator = vine.compile(
     visibility: vine.enum(['public', 'contacts', 'private'] as const).optional(),
 
     /** Optional: update the unique username. */
-    username: vine.string().minLength(3).maxLength(32).regex(/^[a-zA-Z0-9_]+$/).optional(),
-  })
+    username: vine
+      .string()
+      .minLength(3)
+      .maxLength(32)
+      .regex(/^[a-zA-Z0-9_]+$/)
+      .optional(),
+  }),
 )
 
 export default class ProfileController {
@@ -91,8 +97,7 @@ export default class ProfileController {
      * Username uniqueness is enforced by the database constraint.
      */
     if (payload.username !== undefined) {
-      const existing = await Account
-        .query()
+      const existing = await Account.query()
         .whereRaw('LOWER(username) = LOWER(?)', [payload.username])
         .whereNot('id', account.id)
         .first()
@@ -128,8 +133,8 @@ export default class ProfileController {
      * should use EIP-55 checksums locally if needed.
      */
     if (payload.exposedWalletAddresses !== undefined) {
-      profile.exposedWalletAddresses = payload.exposedWalletAddresses.map(
-        (addr) => addr.toLowerCase()
+      profile.exposedWalletAddresses = payload.exposedWalletAddresses.map((addr) =>
+        addr.toLowerCase(),
       )
     }
 
@@ -211,8 +216,7 @@ export default class ProfileController {
   async get({ params, response }: HttpContext): Promise<void> {
     const username = params.username
 
-    const account = await Account
-      .query()
+    const account = await Account.query()
       .whereRaw('LOWER(username) = LOWER(?)', [username])
       .where('verified', true)
       .first()
@@ -245,12 +249,10 @@ export default class ProfileController {
             /**
              * Wallet addresses are only shown for public profiles.
              * For "contacts" visibility, they require mutual contact
-             * verification (TODO: implement contact verification).
+             * verification (TODO(#54): implement contact verification).
              */
             exposedWalletAddresses:
-              profile.visibility === 'public'
-                ? profile.exposedWalletAddresses
-                : [],
+              profile.visibility === 'public' ? profile.exposedWalletAddresses : [],
           }
         : null,
     })

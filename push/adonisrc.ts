@@ -1,9 +1,7 @@
 import { defineConfig } from '@adonisjs/core/app'
 
 export default defineConfig({
-  commands: [
-    () => import('@adonisjs/core/commands'),
-  ],
+  commands: [() => import('@adonisjs/core/commands')],
 
   /*
   |--------------------------------------------------------------------------
@@ -21,10 +19,7 @@ export default defineConfig({
     () => import('@adonisjs/core/providers/vinejs_provider'),
   ],
 
-  preloads: [
-    () => import('#start/routes'),
-    () => import('#start/kernel'),
-  ],
+  preloads: [() => import('#start/routes'), () => import('#start/kernel')],
 
   metaFiles: [
     {

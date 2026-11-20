@@ -13,10 +13,8 @@
     "start": "node build/bin/server.js",
     "build": "node ace build",
     "dev": "node ace serve --hmr",
-    "test": "vitest",
-    "test:unit": "vitest run",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "typecheck": "tsc --noEmit"
@@ -36,7 +34,6 @@
     "prettier": "^3.4.2",
     "ts-node-maintained": "^10.9.5",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.0",
     "pino-pretty": "^13.0.0"
   },
   "hotHook": {

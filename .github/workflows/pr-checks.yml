@@ -90,7 +90,6 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
       - run: pnpm audit --audit-level=high
 
   # ──────────────────────────────────────────────
@@ -135,6 +134,13 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      - name: DEBUG turbo build
+        run: |
+          pnpm exec turbo run build --concurrency=1 2>&1 | grep -E 'ERR_|Tasks:|Failed' || true
+          echo ===PARALLEL
+          pnpm exec turbo run build --force 2>&1 | grep -E 'ERR_|Tasks:|Failed' || true
+          echo ===NOTURBO
+          for p in relay identity push blockchain; do (cd $p && node ace build >/dev/null 2>&1 && echo $p OK || echo $p FAIL); done
       - run: pnpm run test
 
   # ──────────────────────────────────────────────

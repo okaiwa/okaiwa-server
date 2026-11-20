@@ -16,101 +16,102 @@ const ProfileController = () => import('#app/controllers/profile_controller')
  * - All authenticated routes require a valid session token.
  */
 
-router.group(() => {
-  /**
-   * === Authentication ===
-   *
-   * Registration uses phone hash + identity key.
-   * Verification uses a one-time SMS code (the SMS is sent by a
-   * separate, isolated SMS gateway that does NOT have access to
-   * the identity database).
-   */
-  router.post('/auth/register', [AuthController, 'register'])
-  router.post('/auth/verify', [AuthController, 'verify'])
-  router.post('/auth/refresh', [AuthController, 'refresh'])
-  /**
-   * Login is symmetric to register but only succeeds for accounts
-   * that already exist — the mobile UI uses the 404 to push the user
-   * into the create-account flow instead of silently registering.
-   */
-  router.post('/auth/login', [AuthController, 'login'])
+router
+  .group(() => {
+    /**
+     * === Authentication ===
+     *
+     * Registration uses phone hash + identity key.
+     * Verification uses a one-time SMS code (the SMS is sent by a
+     * separate, isolated SMS gateway that does NOT have access to
+     * the identity database).
+     */
+    router.post('/auth/register', [AuthController, 'register'])
+    router.post('/auth/verify', [AuthController, 'verify'])
+    router.post('/auth/refresh', [AuthController, 'refresh'])
+    /**
+     * Login is symmetric to register but only succeeds for accounts
+     * that already exist — the mobile UI uses the 404 to push the user
+     * into the create-account flow instead of silently registering.
+     */
+    router.post('/auth/login', [AuthController, 'login'])
 
-  /**
-   * === Key Management (Signal Protocol) ===
-   *
-   * Pre-key bundles are essential for the Double Ratchet protocol.
-   * - Upload: Client uploads a batch of one-time pre-keys.
-   * - Fetch: Requesting a pre-key for a device CONSUMES it (one-time use).
-   *   This prevents replay attacks and ensures forward secrecy.
-   */
-  /**
-   * Upload your own batch of one-time pre-keys (and optionally a
-   * fresh signed pre-key). Requires Bearer auth — accountId is
-   * derived server-side from the token, never from a client header
-   * (closes the same horizontal-bypass we fixed on PUT /v1/profile).
-   */
-  router.post('/keys/prekeys', [KeyController, 'uploadPreKeys']).use(middleware.session())
-  /**
-   * Fetch (and consume) ONE one-time pre-key for the target deviceId,
-   * along with the long-lived signed pre-key + identity key. The
-   * one-time prekey is removed from the pool atomically — see the
-   * controller for the FOR UPDATE SKIP LOCKED dance that prevents
-   * two requesters from receiving the same key (which would break
-   * X3DH forward secrecy).
-   *
-   * Open route on purpose: peers who want to message someone need to
-   * fetch their bundle BEFORE having a session with them, so we
-   * can't gate this on "knowing the recipient". Discovery already
-   * exposes the deviceId only after username/wallet/phone-hash
-   * match, so the attack surface is bounded by what discovery lets
-   * the caller see. Rate limiting on this endpoint is the next
-   * natural defense — tracked separately.
-   */
-  router.post('/keys/prekey/:deviceId', [KeyController, 'fetchPreKey'])
+    /**
+     * === Key Management (Signal Protocol) ===
+     *
+     * Pre-key bundles are essential for the Double Ratchet protocol.
+     * - Upload: Client uploads a batch of one-time pre-keys.
+     * - Fetch: Requesting a pre-key for a device CONSUMES it (one-time use).
+     *   This prevents replay attacks and ensures forward secrecy.
+     */
+    /**
+     * Upload your own batch of one-time pre-keys (and optionally a
+     * fresh signed pre-key). Requires Bearer auth — accountId is
+     * derived server-side from the token, never from a client header
+     * (closes the same horizontal-bypass we fixed on PUT /v1/profile).
+     */
+    router.post('/keys/prekeys', [KeyController, 'uploadPreKeys']).use(middleware.session())
+    /**
+     * Fetch (and consume) ONE one-time pre-key for the target deviceId,
+     * along with the long-lived signed pre-key + identity key. The
+     * one-time prekey is removed from the pool atomically — see the
+     * controller for the FOR UPDATE SKIP LOCKED dance that prevents
+     * two requesters from receiving the same key (which would break
+     * X3DH forward secrecy).
+     *
+     * Open route on purpose: peers who want to message someone need to
+     * fetch their bundle BEFORE having a session with them, so we
+     * can't gate this on "knowing the recipient". Discovery already
+     * exposes the deviceId only after username/wallet/phone-hash
+     * match, so the attack surface is bounded by what discovery lets
+     * the caller see. Rate limiting on this endpoint is the next
+     * natural defense — tracked separately.
+     */
+    router.post('/keys/prekey/:deviceId', [KeyController, 'fetchPreKey'])
 
-  /**
-   * === Discovery ===
-   *
-   * Privacy-preserving contact discovery:
-   * - Phone hash batch lookup: Client hashes ALL contacts locally,
-   *   sends the hashes. Server compares against stored hashes.
-   *   NEVER sees plaintext numbers.
-   * - Username search: Public, opt-in discovery.
-   * - Wallet address search: Find users who expose their wallet.
-   */
-  router.post('/discovery/phone-hashes', [DiscoveryController, 'discoverByPhoneHashes'])
-  router.get('/discovery/username/:username', [DiscoveryController, 'searchByUsername'])
-  router.get('/discovery/wallet/:address', [DiscoveryController, 'searchByWalletAddress'])
+    /**
+     * === Discovery ===
+     *
+     * Privacy-preserving contact discovery:
+     * - Phone hash batch lookup: Client hashes ALL contacts locally,
+     *   sends the hashes. Server compares against stored hashes.
+     *   NEVER sees plaintext numbers.
+     * - Username search: Public, opt-in discovery.
+     * - Wallet address search: Find users who expose their wallet.
+     */
+    router.post('/discovery/phone-hashes', [DiscoveryController, 'discoverByPhoneHashes'])
+    router.get('/discovery/username/:username', [DiscoveryController, 'searchByUsername'])
+    router.get('/discovery/wallet/:address', [DiscoveryController, 'searchByWalletAddress'])
 
-  /**
-   * === Profile ===
-   *
-   * User-controlled public profile. Users choose what to expose.
-   * Wallet addresses are opt-in (exposedWalletAddresses).
-   *
-   * PUT requires the session middleware so the accountId is derived
-   * from the HMAC-signed access token, NOT from a client-supplied
-   * header. Without this guard ANY client could overwrite ANY user's
-   * profile by passing the target accountId — see the security
-   * review on commit 386d11d.
-   *
-   * GET is public (intentional): public profiles are discoverable
-   * by anyone via username, no auth needed.
-   */
-  router.put('/profile', [ProfileController, 'update']).use(middleware.session())
-  /**
-   * GET /v1/profile/me — auth-required. Returns the caller's own
-   * profile (even private fields). The mobile Profile tab calls this
-   * on each cold start so the UI reflects what was last saved
-   * server-side, not stale local cache.
-   *
-   * Declared BEFORE /profile/:username so the static `me` doesn't
-   * get swallowed by the dynamic param matcher.
-   */
-  router.get('/profile/me', [ProfileController, 'me']).use(middleware.session())
-  router.get('/profile/:username', [ProfileController, 'get'])
-
-}).prefix('/v1')
+    /**
+     * === Profile ===
+     *
+     * User-controlled public profile. Users choose what to expose.
+     * Wallet addresses are opt-in (exposedWalletAddresses).
+     *
+     * PUT requires the session middleware so the accountId is derived
+     * from the HMAC-signed access token, NOT from a client-supplied
+     * header. Without this guard ANY client could overwrite ANY user's
+     * profile by passing the target accountId — see the security
+     * review on commit 386d11d.
+     *
+     * GET is public (intentional): public profiles are discoverable
+     * by anyone via username, no auth needed.
+     */
+    router.put('/profile', [ProfileController, 'update']).use(middleware.session())
+    /**
+     * GET /v1/profile/me — auth-required. Returns the caller's own
+     * profile (even private fields). The mobile Profile tab calls this
+     * on each cold start so the UI reflects what was last saved
+     * server-side, not stale local cache.
+     *
+     * Declared BEFORE /profile/:username so the static `me` doesn't
+     * get swallowed by the dynamic param matcher.
+     */
+    router.get('/profile/me', [ProfileController, 'me']).use(middleware.session())
+    router.get('/profile/:username', [ProfileController, 'get'])
+  })
+  .prefix('/v1')
 
 /**
  * Health check — returns 200 if service and database are reachable.

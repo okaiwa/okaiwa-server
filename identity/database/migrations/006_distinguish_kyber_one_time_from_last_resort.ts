@@ -36,7 +36,7 @@ export default class DistinguishKyberOneTimeFromLastResort extends BaseSchema {
     // the migration. Knex doesn't expose this directly so we go raw.
     this.schema.raw(
       `CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_pre_keys_account_kyber_lastresort
-       ON pre_keys (account_id, is_kyber_pre_key, is_last_resort_kyber, consumed)`
+       ON pre_keys (account_id, is_kyber_pre_key, is_last_resort_kyber, consumed)`,
     )
   }
 

@@ -86,8 +86,10 @@ export const sendMessageValidator = vine.compile(
      * would then be surfaced verbatim by the recipient's profile
      * card on first contact.
      */
-    senderAccountId: vine.string().regex(/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/),
-  })
+    senderAccountId: vine
+      .string()
+      .regex(/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/),
+  }),
 )
 
 /**
@@ -99,7 +101,7 @@ export const sendMessageValidator = vine.compile(
 export const pendingMessagesValidator = vine.compile(
   vine.object({
     deviceId: vine.string().regex(DEVICE_ID_REGEX),
-  })
+  }),
 )
 
 /**
@@ -110,5 +112,5 @@ export const pendingMessagesValidator = vine.compile(
 export const acknowledgeValidator = vine.compile(
   vine.object({
     id: vine.string().regex(MESSAGE_ID_REGEX),
-  })
+  }),
 )
