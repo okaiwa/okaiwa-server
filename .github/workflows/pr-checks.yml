@@ -134,13 +134,13 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - name: DEBUG ace loader
-        working-directory: push
+      - name: DEBUG turbo build
         run: |
-          node -v; ls node_modules | head -40; ls node_modules/ts-node-maintained >/dev/null && echo TSNODE_PRESENT
-          printenv | grep -E '^(NODE_|TS_NODE)' | cut -d= -f1 || true
-          node --input-type=module -e "import('ts-node-maintained/register/esm').then(()=>console.log('LOADER_OK'),e=>console.log('LOADER_ERR',e))"
-          node ace build 2>&1 | tail -30 || true
+          pnpm exec turbo run build --concurrency=1 2>&1 | grep -E 'ERR_|Tasks:|Failed' || true
+          echo ===PARALLEL
+          pnpm exec turbo run build --force 2>&1 | grep -E 'ERR_|Tasks:|Failed' || true
+          echo ===NOTURBO
+          for p in relay identity push blockchain; do (cd $p && node ace build >/dev/null 2>&1 && echo $p OK || echo $p FAIL); done
       - run: pnpm run test
 
   # ──────────────────────────────────────────────
