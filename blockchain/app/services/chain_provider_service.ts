@@ -29,13 +29,7 @@
 
 /** Supported blockchain networks. */
 export type SupportedChain =
-  | 'ethereum'
-  | 'polygon'
-  | 'arbitrum'
-  | 'optimism'
-  | 'base'
-  | 'avalanche'
-  | 'bsc'
+  'ethereum' | 'polygon' | 'arbitrum' | 'optimism' | 'base' | 'avalanche' | 'bsc'
 
 /**
  * Configuration for an RPC provider endpoint.

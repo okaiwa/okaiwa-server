@@ -52,9 +52,7 @@ export class ApnsService {
   private readonly authKey: string
 
   constructor() {
-    this.host = process.env.NODE_ENV === 'production'
-      ? APNS_HOST_PRODUCTION
-      : APNS_HOST_SANDBOX
+    this.host = process.env.NODE_ENV === 'production' ? APNS_HOST_PRODUCTION : APNS_HOST_SANDBOX
 
     this.bundleId = process.env.APNS_BUNDLE_ID ?? ''
     this.teamId = process.env.APNS_TEAM_ID ?? ''
@@ -124,7 +122,7 @@ export class ApnsService {
       'apns-push-type': PUSH_TYPE,
       'apns-priority': SILENT_PUSH_PRIORITY,
       'apns-expiration': '0',
-      'authorization': `bearer ${await this.generateJwt()}`,
+      authorization: `bearer ${await this.generateJwt()}`,
     }
 
     /**

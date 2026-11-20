@@ -35,7 +35,7 @@ type Platform = 'ios' | 'android'
 export default class PushController {
   constructor(
     private readonly apns: ApnsService,
-    private readonly fcm: FcmService
+    private readonly fcm: FcmService,
   ) {}
 
   /**
@@ -79,9 +79,10 @@ export default class PushController {
        * or any internal error details. We only report that the
        * push failed.
        */
-      const code = error instanceof Error && 'code' in error
-        ? (error as Error & { code: string }).code
-        : 'UNKNOWN'
+      const code =
+        error instanceof Error && 'code' in error
+          ? (error as Error & { code: string }).code
+          : 'UNKNOWN'
 
       if (code === 'INVALID_TOKEN') {
         /**

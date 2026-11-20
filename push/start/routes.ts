@@ -22,24 +22,25 @@ const PushController = () => import('#app/controllers/push_controller')
  * encrypted channel.
  */
 
-router.group(() => {
-  /**
-   * POST /v1/push/send
-   *
-   * Send a silent push notification to a registered device.
-   * The payload contains ONLY the device token and platform — no content.
-   */
-  router.post('/push/send', [PushController, 'sendSilentPush'])
+router
+  .group(() => {
+    /**
+     * POST /v1/push/send
+     *
+     * Send a silent push notification to a registered device.
+     * The payload contains ONLY the device token and platform — no content.
+     */
+    router.post('/push/send', [PushController, 'sendSilentPush'])
 
-  /**
-   * POST /v1/push/register
-   *
-   * Register a device token (APNs or FCM) for push notifications.
-   * The token is stored in association with a device ID (not user identity).
-   */
-  router.post('/push/register', [PushController, 'registerDevice'])
-
-}).prefix('/v1')
+    /**
+     * POST /v1/push/register
+     *
+     * Register a device token (APNs or FCM) for push notifications.
+     * The token is stored in association with a device ID (not user identity).
+     */
+    router.post('/push/register', [PushController, 'registerDevice'])
+  })
+  .prefix('/v1')
 
 /**
  * Health check.

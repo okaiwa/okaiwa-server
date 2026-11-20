@@ -85,7 +85,7 @@ export class MessageQueueService {
       msgKey,
       JSON.stringify({ blob, enqueuedAt: now, senderDeviceId, senderAccountId }),
       'EX',
-      MESSAGE_TTL_SECONDS
+      MESSAGE_TTL_SECONDS,
     )
 
     /**

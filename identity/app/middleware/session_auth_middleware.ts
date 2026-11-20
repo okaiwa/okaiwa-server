@@ -92,10 +92,7 @@ export default class SessionAuthMiddleware {
       .digest('hex')
 
     try {
-      const ok = timingSafeEqual(
-        Buffer.from(providedHmac, 'hex'),
-        Buffer.from(expectedHmac, 'hex')
-      )
+      const ok = timingSafeEqual(Buffer.from(providedHmac, 'hex'), Buffer.from(expectedHmac, 'hex'))
       return ok ? accountId : null
     } catch {
       return null

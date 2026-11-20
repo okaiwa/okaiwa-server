@@ -31,43 +31,44 @@ const BalanceController = () => import('#app/controllers/balance_controller')
  * - Request/response bodies
  */
 
-router.group(() => {
-  /**
-   * POST /v1/rpc/:chain
-   *
-   * Proxy a JSON-RPC request to the appropriate chain's RPC provider.
-   * All identifying metadata is stripped before forwarding.
-   * The provider's API key is injected server-side.
-   */
-  router.post('/rpc/:chain', [RpcProxyController, 'proxy'])
+router
+  .group(() => {
+    /**
+     * POST /v1/rpc/:chain
+     *
+     * Proxy a JSON-RPC request to the appropriate chain's RPC provider.
+     * All identifying metadata is stripped before forwarding.
+     * The provider's API key is injected server-side.
+     */
+    router.post('/rpc/:chain', [RpcProxyController, 'proxy'])
 
-  /**
-   * GET /v1/balance/:chain/:address
-   *
-   * Get the native token balance for an address on a specific chain.
-   * Results are cached briefly (30s) to reduce RPC provider load,
-   * but the cache key does NOT include any client identity.
-   */
-  router.get('/balance/:chain/:address', [BalanceController, 'getBalance'])
+    /**
+     * GET /v1/balance/:chain/:address
+     *
+     * Get the native token balance for an address on a specific chain.
+     * Results are cached briefly (30s) to reduce RPC provider load,
+     * but the cache key does NOT include any client identity.
+     */
+    router.get('/balance/:chain/:address', [BalanceController, 'getBalance'])
 
-  /**
-   * GET /v1/transactions/:chain/:address
-   *
-   * Get recent transactions for an address on a specific chain.
-   * Proxied anonymously through the RPC provider.
-   */
-  router.get('/transactions/:chain/:address', [RpcProxyController, 'getTransactions'])
+    /**
+     * GET /v1/transactions/:chain/:address
+     *
+     * Get recent transactions for an address on a specific chain.
+     * Proxied anonymously through the RPC provider.
+     */
+    router.get('/transactions/:chain/:address', [RpcProxyController, 'getTransactions'])
 
-  /**
-   * POST /v1/broadcast/:chain
-   *
-   * Broadcast a signed transaction to the network.
-   * The transaction is already signed by the client — the server
-   * cannot modify it and does NOT know the signing key.
-   */
-  router.post('/broadcast/:chain', [RpcProxyController, 'broadcastTransaction'])
-
-}).prefix('/v1')
+    /**
+     * POST /v1/broadcast/:chain
+     *
+     * Broadcast a signed transaction to the network.
+     * The transaction is already signed by the client — the server
+     * cannot modify it and does NOT know the signing key.
+     */
+    router.post('/broadcast/:chain', [RpcProxyController, 'broadcastTransaction'])
+  })
+  .prefix('/v1')
 
 /**
  * Health check.

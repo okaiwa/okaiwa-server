@@ -1,6 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
-import { sendMessageValidator, pendingMessagesValidator, acknowledgeValidator } from '#app/validators/message_validator'
+import {
+  sendMessageValidator,
+  pendingMessagesValidator,
+  acknowledgeValidator,
+} from '#app/validators/message_validator'
 import { MessageQueueService } from '#app/services/message_queue_service'
 
 /**

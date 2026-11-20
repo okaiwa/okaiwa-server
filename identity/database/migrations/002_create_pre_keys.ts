@@ -29,7 +29,9 @@ export default class CreatePreKeys extends BaseSchema {
        * CASCADE delete: when an account is deleted, all its pre-keys
        * are automatically removed.
        */
-      table.uuid('account_id').notNullable()
+      table
+        .uuid('account_id')
+        .notNullable()
         .references('id')
         .inTable('accounts')
         .onDelete('CASCADE')
@@ -76,10 +78,7 @@ export default class CreatePreKeys extends BaseSchema {
        * The most common query is: "find an unconsumed one-time pre-key
        * for account X" — this index makes it O(1).
        */
-      table.index(
-        ['account_id', 'is_signed_pre_key', 'consumed'],
-        'idx_pre_keys_available'
-      )
+      table.index(['account_id', 'is_signed_pre_key', 'consumed'], 'idx_pre_keys_available')
 
       /**
        * Unique constraint: each keyId is unique per account.

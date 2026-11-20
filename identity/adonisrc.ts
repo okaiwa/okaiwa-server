@@ -1,10 +1,7 @@
 import { defineConfig } from '@adonisjs/core/app'
 
 export default defineConfig({
-  commands: [
-    () => import('@adonisjs/core/commands'),
-    () => import('@adonisjs/lucid/commands'),
-  ],
+  commands: [() => import('@adonisjs/core/commands'), () => import('@adonisjs/lucid/commands')],
 
   /*
   |--------------------------------------------------------------------------
@@ -24,10 +21,7 @@ export default defineConfig({
     () => import('@adonisjs/redis/redis_provider'),
   ],
 
-  preloads: [
-    () => import('#start/routes'),
-    () => import('#start/kernel'),
-  ],
+  preloads: [() => import('#start/routes'), () => import('#start/kernel')],
 
   metaFiles: [
     {

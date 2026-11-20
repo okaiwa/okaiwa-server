@@ -32,23 +32,28 @@ import Account from '#app/models/account'
 const uploadPreKeysValidator = vine.compile(
   vine.object({
     /** Batch of one-time pre-keys to upload. */
-    preKeys: vine.array(
-      vine.object({
-        keyId: vine.number().positive(),
-        publicKey: vine.string().minLength(32).maxLength(128),
-      })
-    ).minLength(1).maxLength(100),
+    preKeys: vine
+      .array(
+        vine.object({
+          keyId: vine.number().positive(),
+          publicKey: vine.string().minLength(32).maxLength(128),
+        }),
+      )
+      .minLength(1)
+      .maxLength(100),
 
     /**
      * Optional signed pre-key rotation.
      * Clients should rotate the signed pre-key periodically
      * (recommended: every 7-30 days).
      */
-    signedPreKey: vine.object({
-      keyId: vine.number().positive(),
-      publicKey: vine.string().minLength(32).maxLength(128),
-      signature: vine.string().minLength(64).maxLength(256),
-    }).optional(),
+    signedPreKey: vine
+      .object({
+        keyId: vine.number().positive(),
+        publicKey: vine.string().minLength(32).maxLength(128),
+        signature: vine.string().minLength(64).maxLength(256),
+      })
+      .optional(),
 
     /**
      * Optional batch of one-time Kyber-1024 (ML-KEM) pre-keys for
@@ -59,13 +64,16 @@ const uploadPreKeysValidator = vine.compile(
      * Each Kyber publicKey is ~1568 bytes raw → ~2090 chars base64
      * hence the wider maxLength bound.
      */
-    kyberPreKeys: vine.array(
-      vine.object({
-        keyId: vine.number().positive(),
-        publicKey: vine.string().minLength(64).maxLength(4096),
-        signature: vine.string().minLength(64).maxLength(256),
-      })
-    ).maxLength(100).optional(),
+    kyberPreKeys: vine
+      .array(
+        vine.object({
+          keyId: vine.number().positive(),
+          publicKey: vine.string().minLength(64).maxLength(4096),
+          signature: vine.string().minLength(64).maxLength(256),
+        }),
+      )
+      .maxLength(100)
+      .optional(),
 
     /**
      * Optional last-resort Kyber pre-key — long-lived fallback used
@@ -74,19 +82,21 @@ const uploadPreKeysValidator = vine.compile(
      * same model as the X3DH classic signed pre-key fallback).
      * Clients rotate it periodically by uploading a fresh one.
      */
-    lastResortKyberPreKey: vine.object({
-      keyId: vine.number().positive(),
-      publicKey: vine.string().minLength(64).maxLength(4096),
-      signature: vine.string().minLength(64).maxLength(256),
-    }).optional(),
-  })
+    lastResortKyberPreKey: vine
+      .object({
+        keyId: vine.number().positive(),
+        publicKey: vine.string().minLength(64).maxLength(4096),
+        signature: vine.string().minLength(64).maxLength(256),
+      })
+      .optional(),
+  }),
 )
 
 /** Validator for pre-key fetch. */
 const fetchPreKeyValidator = vine.compile(
   vine.object({
     deviceId: vine.string().regex(/^[a-zA-Z0-9\-]{32,128}$/),
-  })
+  }),
 )
 
 export default class KeyController {
@@ -197,8 +207,7 @@ export default class KeyController {
      * false explicitly — without it, kyber rows would inflate the
      * count and the client would let its real X3DH OPK pool drain.
      */
-    const availableCount = await PreKey
-      .query()
+    const availableCount = await PreKey.query()
       .where('accountId', account.id)
       .where('isSignedPreKey', false)
       .where('isKyberPreKey', false)
@@ -253,8 +262,7 @@ export default class KeyController {
     }
 
     /** Fetch the current signed pre-key (long-lived). */
-    const signedPreKey = await PreKey
-      .query()
+    const signedPreKey = await PreKey.query()
       .where('accountId', account.id)
       .where('isSignedPreKey', true)
       .where('isKyberPreKey', false)
@@ -288,8 +296,7 @@ export default class KeyController {
      * caller skips the locked row and either gets the next available
      * key or null. No race possible.
      */
-    const consumedRows = await PreKey
-      .query()
+    const consumedRows = await PreKey.query()
       .from('pre_keys')
       .whereRaw(
         `id = (
@@ -302,14 +309,12 @@ export default class KeyController {
           LIMIT 1
           FOR UPDATE SKIP LOCKED
         )`,
-        [account.id]
+        [account.id],
       )
       .update({ consumed: true })
       .returning(['key_id', 'public_key'])
 
-    const oneTimePreKey = consumedRows[0] as
-      | { key_id: number; public_key: string }
-      | undefined
+    const oneTimePreKey = consumedRows[0] as { key_id: number; public_key: string } | undefined
 
     /**
      * Fetch a Kyber pre-key for PQXDH, in two strict steps:
@@ -331,8 +336,7 @@ export default class KeyController {
      * fetching the bundle in a loop. Migration 006 introduced the
      * `is_last_resort_kyber` flag that gates which path applies.
      */
-    const consumedKyberRows = await PreKey
-      .query()
+    const consumedKyberRows = await PreKey.query()
       .from('pre_keys')
       .whereRaw(
         `id = (
@@ -345,14 +349,12 @@ export default class KeyController {
           LIMIT 1
           FOR UPDATE SKIP LOCKED
         )`,
-        [account.id]
+        [account.id],
       )
       .update({ consumed: true })
       .returning(['key_id', 'public_key', 'signature'])
 
-    let kyberPreKey:
-      | { keyId: number; publicKey: string; signature: string | null }
-      | null =
+    let kyberPreKey: { keyId: number; publicKey: string; signature: string | null } | null =
       consumedKyberRows[0]
         ? {
             keyId: (consumedKyberRows[0] as { key_id: number }).key_id,
@@ -362,8 +364,7 @@ export default class KeyController {
         : null
 
     if (!kyberPreKey) {
-      const lastResort = await PreKey
-        .query()
+      const lastResort = await PreKey.query()
         .where('accountId', account.id)
         .where('isKyberPreKey', true)
         .where('isLastResortKyber', true)

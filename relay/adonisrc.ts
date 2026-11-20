@@ -6,9 +6,7 @@ export default defineConfig({
   | Commands
   |--------------------------------------------------------------------------
   */
-  commands: [
-    () => import('@adonisjs/core/commands'),
-  ],
+  commands: [() => import('@adonisjs/core/commands')],
 
   /*
   |--------------------------------------------------------------------------
@@ -31,10 +29,7 @@ export default defineConfig({
   | Preloads
   |--------------------------------------------------------------------------
   */
-  preloads: [
-    () => import('#start/routes'),
-    () => import('#start/kernel'),
-  ],
+  preloads: [() => import('#start/routes'), () => import('#start/kernel')],
 
   /*
   |--------------------------------------------------------------------------

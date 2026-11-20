@@ -110,7 +110,7 @@ export default class WebSocketController {
    */
   async handleFrame(
     _deviceId: string,
-    data: WsIncomingMessage
+    data: WsIncomingMessage,
   ): Promise<WsOutgoingMessage | WsErrorMessage | void> {
     switch (data.type) {
       case 'ack': {

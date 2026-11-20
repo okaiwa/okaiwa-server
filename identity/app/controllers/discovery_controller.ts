@@ -37,10 +37,11 @@ const phoneHashesValidator = vine.compile(
      * Client computes these locally: SHA-256(normalize(phoneNumber)).
      * Maximum 1000 per request to prevent mass scraping.
      */
-    hashes: vine.array(
-      vine.string().regex(/^[a-f0-9]{64}$/)
-    ).minLength(1).maxLength(1000),
-  })
+    hashes: vine
+      .array(vine.string().regex(/^[a-f0-9]{64}$/))
+      .minLength(1)
+      .maxLength(1000),
+  }),
 )
 
 export default class DiscoveryController {
@@ -68,8 +69,7 @@ export default class DiscoveryController {
      * Only verified accounts are returned to prevent discovery
      * of accounts in registration limbo.
      */
-    const matches = await Account
-      .query()
+    const matches = await Account.query()
       .whereIn('phoneHash', payload.hashes)
       .where('verified', true)
       .select('id', 'username', 'identityPublicKey', 'registrationId', 'deviceId')
@@ -128,8 +128,7 @@ export default class DiscoveryController {
      * Exact match only. Case-insensitive comparison using
      * database-level LOWER() for consistency.
      */
-    const account = await Account
-      .query()
+    const account = await Account.query()
       .whereRaw('LOWER(username) = LOWER(?)', [username])
       .where('verified', true)
       .first()
@@ -181,9 +180,8 @@ export default class DiscoveryController {
      * Security: The wallet address comparison is case-insensitive
      * for Ethereum addresses (which use mixed-case checksums).
      */
-    const profile = await Profile
-      .query()
-      .whereRaw("exposed_wallet_addresses @> ?::jsonb", [JSON.stringify([address.toLowerCase()])])
+    const profile = await Profile.query()
+      .whereRaw('exposed_wallet_addresses @> ?::jsonb', [JSON.stringify([address.toLowerCase()])])
       .where('visibility', 'public')
       .preload('account')
       .first()
